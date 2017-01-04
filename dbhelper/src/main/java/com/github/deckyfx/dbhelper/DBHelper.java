@@ -52,6 +52,8 @@ public class DBHelper {
 
     public DBHelper(Context context, Class<? extends AbstractDaoMaster> daoMasterClass, String dbName){
         this.mContext = context;
+        this.mDAOs = new HashMap<String, EntityMapWrapper>();
+
         if (daoMasterClass != null) {
             Method method = null;
             try {
