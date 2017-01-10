@@ -45,6 +45,7 @@ public class DBHelper {
 
     public static class INVOKE {
         public static final String QUERY_BUILDER        = "queryBuilder";
+        public static final String LOAD                 = "load";
         public static final String LOAD_ALL             = "loadAll";
         public static final String INSERT_OR_REPLACE    = "insertOrReplace";
         public static final String DELETE_ALL           = "deleteAll";
@@ -193,6 +194,10 @@ public class DBHelper {
 
         public List<?> loadAll() {
             return (List) this.invoke(INVOKE.LOAD_ALL);
+        }
+
+        public Object load(long id) {
+            return this.invoke(INVOKE.LOAD, id);
         }
 
         public void insertOrReplace(Object data) {
