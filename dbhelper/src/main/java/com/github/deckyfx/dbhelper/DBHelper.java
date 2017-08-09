@@ -241,6 +241,10 @@ public class DBHelper {
         }
     }
 
+    public EntityMapWrapper getEntity(Class<?> klass) {
+        return this.getEntity(klass.getSimpleName());
+    }
+
     public EntityMapWrapper getEntity(String tableName) {
         EntityMapWrapper entityWrapper = this.mDAOs.get(tableName);
         return entityWrapper;

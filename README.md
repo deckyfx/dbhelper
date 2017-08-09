@@ -18,7 +18,7 @@ Add the dependency
 ```gradle
 dependencies {
 	compile 'org.greenrobot:greendao:3.2.0'
-	compile 'com.github.deckyfx:dbhelper:0.4'
+	compile 'com.github.deckyfx:dbhelper:0.5'
 }
 ```
 
