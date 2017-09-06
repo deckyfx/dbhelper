@@ -48,6 +48,7 @@ public class DBHelper {
         public static final String LOAD                 = "load";
         public static final String LOAD_ALL             = "loadAll";
         public static final String INSERT_OR_REPLACE    = "insertOrReplace";
+        public static final String INSERT               = "insert";
         public static final String DELETE_ALL           = "deleteAll";
     }
 
@@ -115,12 +116,16 @@ public class DBHelper {
                     method.setAccessible(false);
                 } catch (SecurityException e) {
                     e.printStackTrace();
+                    throw new InvokeError(e);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
+                    throw new InvokeError(e);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
+                    throw new InvokeError(e);
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
+                    throw new InvokeError(e);
                 }
             }
             return result;
@@ -200,6 +205,22 @@ public class DBHelper {
             return this.invoke(INVOKE.LOAD, id);
         }
 
+        public void insert(Object[] datas) {
+            for (Object data : datas) {
+                this.invoke(INVOKE.INSERT, data);
+            }
+        }
+
+        public void insert(Object data) {
+            this.invoke(INVOKE.INSERT, data);
+        }
+
+        public void insertOrReplace(Object[] datas) {
+            for (Object data : datas) {
+                this.invoke(INVOKE.INSERT_OR_REPLACE, data);
+            }
+        }
+
         public void insertOrReplace(Object data) {
             this.invoke(INVOKE.INSERT_OR_REPLACE, data);
         }
@@ -255,6 +276,12 @@ public class DBHelper {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             this.getEntity((String) pair.getKey()).deleteAll();
+        }
+    }
+
+    public class InvokeError extends Error{
+        public InvokeError(Throwable e) {
+            super(e);
         }
     }
 }
