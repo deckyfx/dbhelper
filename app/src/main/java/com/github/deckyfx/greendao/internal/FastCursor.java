@@ -239,6 +239,12 @@ final public class FastCursor implements Cursor {
     }
 
     @Override
+    public void setExtras(Bundle extras) {
+        // setCursor is required for API level 25 and up
+        // ????
+    }
+
+    @Override
     public Bundle getExtras() {
         throw new UnsupportedOperationException();
     }
