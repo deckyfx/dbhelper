@@ -9,21 +9,15 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.greenrobot.greendao.AbstractDao;
-import org.greenrobot.greendao.AbstractDaoMaster;
-import org.greenrobot.greendao.AbstractDaoSession;
-import org.greenrobot.greendao.Property;
-import org.greenrobot.greendao.query.QueryBuilder;
+import com.github.deckyfx.greendao.AbstractDao;
+import com.github.deckyfx.greendao.AbstractDaoMaster;
+import com.github.deckyfx.greendao.AbstractDaoSession;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +33,7 @@ public class DBHelper {
     private AbstractDaoSession DAOSession;
     private SQLiteOpenHelper OpenHelper;
 
-    private HashMap<String, EntityMapWrapper> mDAOs;
+    private HashMap<String, Entity> mDAOs;
 
     private Context mContext;
 
@@ -50,11 +44,12 @@ public class DBHelper {
         public static final String INSERT_OR_REPLACE    = "insertOrReplace";
         public static final String INSERT               = "insert";
         public static final String DELETE_ALL           = "deleteAll";
+        public static final String UPDATE               = "update";
     }
 
     public DBHelper(Context context, Class<? extends AbstractDaoMaster> daoMasterClass, String dbName){
         this.mContext = context;
-        this.mDAOs = new HashMap<String, EntityMapWrapper>();
+        this.mDAOs = new HashMap<String, Entity>();
 
         if (daoMasterClass != null) {
             Method method = null;
@@ -81,155 +76,6 @@ public class DBHelper {
         }
     }
 
-    public class EntityMapWrapper {
-        public AbstractDao<?, Long> entity;
-        public String hashMapKey;
-        public String className;
-        public String fullClassName;
-        public Class<?> properties;
-        public HashMap<String, Field> fields;
-        public HashMap<String, Method> methods;
-
-        public EntityMapWrapper(AbstractDao<?, Long> entity, String fullClassName){
-            this.entity = entity;
-            this.fullClassName = fullClassName;
-            String[] bits = fullClassName.split("\\.");
-            this.className = bits[bits.length-1];
-            this.hashMapKey = this.className.substring(0, this.className.length() - 3); // Remove "Dao" from part className as key
-            Class<?>[] innerClass = this.entity.getClass().getDeclaredClasses();
-            for (int i = 0; i < innerClass.length; i++) {
-                if (innerClass[i].getSimpleName().equals("Properties")) {
-                    this.properties = innerClass[i];
-                }
-            }
-            this.fields = new HashMap<String, Field>();
-            this.methods = new HashMap<String, Method>();
-        }
-
-        public Object invoke(String methodName, Object... arguments) {
-            Object result = null;
-            Method method = this.getMethod(methodName);
-            if (method != null) {
-                try {
-                    method.setAccessible(true);
-                    result = method.invoke(this.entity, arguments);
-                    method.setAccessible(false);
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                    throw new InvokeError(e);
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                    throw new InvokeError(e);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    throw new InvokeError(e);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    throw new InvokeError(e);
-                }
-            }
-            return result;
-        }
-
-        public Property getProperty(String fieldName) {
-            Property property = null;
-            Field field = this.getField(fieldName);
-            if (field != null) {
-                try {
-                    property = (Property) field.get(null);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            return property;
-        }
-
-        private Method getMethod(String methodName){
-            Method method = this.methods.get(methodName);
-            if (method == null) {
-                ArrayList<Method> method_lists = new ArrayList(Arrays.asList(this.entity.getClass().getDeclaredMethods()));
-                method_lists.addAll(Arrays.asList(this.entity.getClass().getSuperclass().getDeclaredMethods()));
-                for (Method m : method_lists) {
-                    if (m.getName().equals(methodName)) {
-                        method = m;
-                        break;
-                    }
-                }
-                if (method != null) {
-                    this.methods.put(methodName, method);
-                }
-            }
-            return method;
-        }
-
-        private Field getField(String fieldName){
-            Field field = this.fields.get(fieldName);
-            if (field == null) {
-                if (fieldName.length() >= 1) {
-                    fieldName = fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
-                }
-                try {
-                    field = this.properties.getDeclaredField(fieldName);
-                } catch(NoSuchFieldException e){
-                    e.printStackTrace();
-                    try {
-                        field = this.properties.getSuperclass().getDeclaredField(fieldName);
-                    } catch(NoSuchFieldException e2){
-                        e2.printStackTrace();
-                        if (this.properties != null) {
-                            try {
-                                field = this.properties.getSuperclass().getDeclaredField(fieldName);
-                            } catch(NoSuchFieldException e3){
-                                e3.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                if (field != null) {
-                    this.fields.put(fieldName, field);
-                }
-            }
-            return field;
-        }
-
-        public QueryBuilder<?> queryBuilder(){
-            QueryBuilder<?> b = (QueryBuilder<?>) this.invoke(INVOKE.QUERY_BUILDER);
-            return b;
-        }
-
-        public List<?> loadAll() {
-            return (List) this.invoke(INVOKE.LOAD_ALL);
-        }
-
-        public Object load(long id) {
-            return this.invoke(INVOKE.LOAD, id);
-        }
-
-        public void insert(Object[] datas) {
-            for (Object data : datas) {
-                this.invoke(INVOKE.INSERT, data);
-            }
-        }
-
-        public void insert(Object data) {
-            this.invoke(INVOKE.INSERT, data);
-        }
-
-        public void insertOrReplace(Object[] datas) {
-            for (Object data : datas) {
-                this.invoke(INVOKE.INSERT_OR_REPLACE, data);
-            }
-        }
-
-        public void insertOrReplace(Object data) {
-            this.invoke(INVOKE.INSERT_OR_REPLACE, data);
-        }
-
-        public void deleteAll() {
-            this.invoke(INVOKE.DELETE_ALL);
-        }
-    }
-
     private void populateDaoEntity(AbstractDaoSession daoSession){
         // populate all DAO
         Class defaultDAOSessionClass = daoSession.getClass();
@@ -241,10 +87,10 @@ public class DBHelper {
             if (methodName.startsWith("get") && methodName.endsWith("Dao")) {
                 try {
                     classMethod = defaultDAOSessionClass.getMethod(methodName);
-                    Object daoInstance = classMethod.invoke(daoSession);
+                    AbstractDao<?, Long> daoInstance = (AbstractDao<?, Long>) classMethod.invoke(daoSession);
                     entityFullName = daoInstance.getClass().getCanonicalName();
                     if (daoInstance != null) {
-                        EntityMapWrapper entity = new EntityMapWrapper((AbstractDao<?, Long>) daoInstance, entityFullName);
+                        Entity entity = new Entity(daoInstance, entityFullName);
                         this.mDAOs.put(entity.hashMapKey, entity);
                     }
                 } catch (SecurityException e) { // exception handling omitted for brevity
@@ -262,12 +108,12 @@ public class DBHelper {
         }
     }
 
-    public EntityMapWrapper getEntity(Class<?> klass) {
+    public Entity getEntity(Class<?> klass) {
         return this.getEntity(klass.getSimpleName());
     }
 
-    public EntityMapWrapper getEntity(String tableName) {
-        EntityMapWrapper entityWrapper = this.mDAOs.get(tableName);
+    public Entity getEntity(String tableName) {
+        Entity entityWrapper = this.mDAOs.get(tableName);
         return entityWrapper;
     }
 
@@ -279,7 +125,7 @@ public class DBHelper {
         }
     }
 
-    public class InvokeError extends Error{
+    public static class InvokeError extends Error{
         public InvokeError(Throwable e) {
             super(e);
         }
