@@ -72,7 +72,10 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
                             if ( value instanceof JSONObject ) {
                                 obj = (JSONObject) value;
                                 if (obj.has(jsonkey_TableName)) {
-                                    entity.insertOrReplace(converter.entityFor(jsonkey_TableName, obj.get(jsonkey_TableName)));
+                                    Object entityData = converter.entityFor(jsonkey_TableName, obj.get(jsonkey_TableName));
+                                    if (entityData != null) {
+                                        entity.insertOrReplace(entityData);
+                                    }
                                 }
                             } else if (value instanceof JSONArray) {
                                 JSONArray array = (JSONArray) value;
@@ -83,7 +86,10 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
                                         if (obj.has(jsonkey_TableName)) {
                                             inner_value     = obj.get(jsonkey_TableName);
                                         }
-                                        entity.insertOrReplace(converter.entityFor(jsonkey_TableName, inner_value));
+                                        Object entityData = converter.entityFor(jsonkey_TableName, inner_value);
+                                        if (entityData != null) {
+                                            entity.insertOrReplace(entityData);
+                                        }
                                     }
                                     array.put(i, inner_value);
                                 }
@@ -180,6 +186,6 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
     }
 
     public interface JSONImportConverter {
-        public Object entityFor(String table, Object value);
+        public Object entityFor(String key, Object value);
     }
 }
