@@ -50,6 +50,9 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
         try {
             JSONObject json						= 	new JSONObject(jsonText);
             Iterator<?> keys = json.keys();
+            if (ignoreKeys == null) {
+                ignoreKeys                      = new ArrayList<>();
+            }
             while( keys.hasNext() ) {
                 String jsonkey_TableName        = (String) keys.next();
                 if (ignoreKeys.contains(jsonkey_TableName)) {
