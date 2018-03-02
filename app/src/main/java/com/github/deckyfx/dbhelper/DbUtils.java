@@ -119,7 +119,7 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
         }
     }
 
-    private void importDbFromAssets(Context context, String assetsFile, String databasename) throws SQLiteException {
+    public void importDbFromAssets(Context context, String assetsFile, String databasename) throws SQLiteException {
         String path     = assetsFile;
         String dbpath   = context.getDatabasePath(databasename).getParent();
         String dest     = dbpath + "/" + databasename;
