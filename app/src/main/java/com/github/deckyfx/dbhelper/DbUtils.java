@@ -45,7 +45,7 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
     private boolean importDbFromJsonString(String jsonText,
                                         DBHelper DbHelper,
                                         ArrayList<String> ignoreKeys,
-                                        JSONImportConverter converter) throws SQLiteException {
+                                        JSONImportConverter converter) {
         boolean success                         =   true;
         try {
             JSONObject json						= 	new JSONObject(jsonText);
