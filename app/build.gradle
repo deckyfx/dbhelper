@@ -9,12 +9,12 @@ def groupName = group
 def artifactName = 'dbhelper'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -48,18 +48,6 @@ configurations {
     }
 }
 
-dependencies {
-    //compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-
-    compileOnly 'io.reactivex:rxjava:1.1.8'
-    compileOnly files('libs/sqlcipher.jar')
-
-    testCompile 'junit:junit:4.12'
-}
-
 // build a jar with source files
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -91,4 +79,17 @@ android.libraryVariants.all { variant ->
     task.dependsOn variant.javaCompile
     task.from variant.javaCompile.destinationDir
     artifacts.add('archives', task);
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // NOTE: test libraries
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    // NOTE: 3rd parties
+    provided 'io.reactivex:rxjava:1.1.8'
+    provided 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
 }

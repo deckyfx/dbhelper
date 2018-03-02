@@ -4,6 +4,8 @@ import com.github.deckyfx.greendao.AbstractDao;
 import com.github.deckyfx.greendao.Property;
 import com.github.deckyfx.greendao.query.QueryBuilder;
 
+import org.json.JSONObject;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,11 +29,11 @@ public class Entity<T, K> {
 
     public Entity(AbstractDao<T, K> entity, String fullClassName){
         super();
-        this.entity = entity;
-        this.fullClassName = fullClassName;
-        String[] bits = fullClassName.split("\\.");
-        this.className = bits[bits.length-1];
-        this.hashMapKey = this.className.substring(0, this.className.length() - 3);
+        this.entity         = entity;
+        this.fullClassName  = fullClassName;
+        String[] bits       = fullClassName.split("\\.");
+        this.className      = bits[bits.length-1];
+        this.hashMapKey     = this.className.substring(0, this.className.length() - 3);
         // Remove "Dao" from part className as key
         Class<?>[] innerClass = this.entity.getClass().getDeclaredClasses();
         for (int i = 0; i < innerClass.length; i++) {
