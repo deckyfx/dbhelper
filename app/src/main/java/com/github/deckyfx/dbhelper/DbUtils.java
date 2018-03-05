@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 
 public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
 
-    private boolean checkDataBase(Context context, String databasename) {
+    public static boolean checkDataBase(Context context, String databasename) {
         boolean checkDB = false;
         try {
             File file   = new File(context.getDatabasePath(databasename).getPath());
@@ -42,7 +42,7 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
             ...
         }
      */
-    public boolean importDbFromJsonString(String jsonText,
+    public static boolean importDbFromJsonString(String jsonText,
                                         DBHelper DbHelper,
                                         ArrayList<String> ignoreKeys,
                                         JSONImportConverter converter) {
@@ -119,7 +119,7 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
         }
     }
 
-    public void importDbFromAssets(Context context, String assetsFile, String databasename) throws SQLiteException {
+    public static void importDbFromAssets(Context context, String assetsFile, String databasename) throws SQLiteException {
         String path     = assetsFile;
         String dbpath   = context.getDatabasePath(databasename).getParent();
         String dest     = dbpath + "/" + databasename;
