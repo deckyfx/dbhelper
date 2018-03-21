@@ -46,9 +46,8 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
                                         DBHelper DbHelper,
                                         ArrayList<String> ignoreKeys,
                                         JSONImportConverter converter) {
-        boolean success                         =   true;
         try {
-            JSONObject json						= 	new JSONObject(jsonText);
+            JSONObject json						= new JSONObject(jsonText);
             Iterator<?> keys = json.keys();
             if (ignoreKeys == null) {
                 ignoreKeys                      = new ArrayList<>();
@@ -96,21 +95,18 @@ public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
                                 value = array;
                             }
                             db.setTransactionSuccessful();
+                            db.endTransaction();
                         } catch (Exception ex) {
-                            SQLiteException se = new SQLiteException("Error while insert data to database");
+                            SQLiteException se = new SQLiteException("Error while insert data to table " + jsonkey_TableName);
                             se.setStackTrace(ex.getStackTrace());
                             se.printStackTrace();
-                            success = false;
-                        } finally {
                             db.endTransaction();
-                            if (!success) {
-                                break;
-                            }
+                            return false;
                         }
                     }
                 }
             }
-            return success;
+            return true;
         } catch (JSONException e) {
             SQLiteException se = new SQLiteException("Unable to parse JSON text");
             se.setStackTrace(e.getStackTrace());
