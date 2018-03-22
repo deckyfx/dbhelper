@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+// changes
+
 public class DbUtils extends com.github.deckyfx.greendao.DbUtils {
 
     public static boolean checkDataBase(Context context, String databasename) {
