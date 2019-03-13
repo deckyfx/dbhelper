@@ -37,11 +37,6 @@ android {
     }
 }
 
-// Automatic versioning
-//ext.INCREASE_VERSION_NAME_WHEN_RUN_TASK = ""
-//ext.INCREASE_VERSION_CODE_WHEN_RUN_TASK = ""
-//apply from: 'https://raw.githubusercontent.com/deckyfx/AndroidTemplate/master/automatic-versioning.gradle'
-
 configurations {
     doc {
         transitive false

@@ -1,10 +1,5 @@
 package com.github.deckyfx.dbhelper;
 
-/**
- * Created by decky on 12/28/16.
- */
-
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -35,8 +30,6 @@ public class DBHelper {
 
     private HashMap<String, Entity> mDAOs;
 
-    private Context mContext;
-
     public static class INVOKE {
         public static final String QUERY_BUILDER        = "queryBuilder";
         public static final String LOAD                 = "load";
@@ -48,7 +41,6 @@ public class DBHelper {
     }
 
     public DBHelper(Context context, Class<? extends AbstractDaoMaster> daoMasterClass, String dbName){
-        this.mContext = context;
         this.mDAOs = new HashMap<String, Entity>();
 
         if (daoMasterClass != null) {
@@ -57,7 +49,7 @@ public class DBHelper {
                 Class<?> devOpenHelperClass = Class.forName(daoMasterClass.getName() + "$" + "DevOpenHelper");
                 Constructor<?> devOpenHelperCtor = devOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class);
                 Constructor<?> daoMasterCtor = daoMasterClass.getConstructor(SQLiteDatabase.class);
-                this.OpenHelper = (SQLiteOpenHelper) devOpenHelperCtor.newInstance(this.mContext, dbName, null);
+                this.OpenHelper = (SQLiteOpenHelper) devOpenHelperCtor.newInstance(context, dbName, null);
                 this.Sqlitedb = this.OpenHelper.getWritableDatabase();
                 this.DAOMaster = (AbstractDaoMaster) daoMasterCtor.newInstance(this.Sqlitedb);
                 this.DAOSession = this.DAOMaster.newSession();
